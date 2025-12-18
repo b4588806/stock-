@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>台積電連動試算工具 (0050 / 0052)</title>
+    <style>
+        body { font-family: 'PingFang TC', sans-serif; padding: 20px; background-color: #f0f2f5; }
+        .container { max-width: 650px; background: white; padding: 25px; border-radius: 15px; shadow: 0 10px 20px rgba(0,0,0,0.1); margin: auto; }
+        .card { border: 1px solid #eee; padding: 15px; border-radius: 10px; margin-top: 15px; background: #fafafa; }
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .highlight { font-weight: bold; color: #0056b3; }
+        .price-up { color: #e74c3c; font-weight: bold; }
+        .api-status { font-size: 12px; color: #27ae60; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>台積電領先指標試算</h2>
+    <div id="apiInfo" class="api-status">● 建議手動更新今日證交所權重數據</div>
+    
+    <div class="input-grid">
+        <div>
+            <label>台積電 (2330) 現價</label>
+            <input type="number" id="tsmcCurrent" value="1420" oninput="calculate()">
+        </div>
+        <div>
+            <label>台積電 預計漲幅</label>
+            <input type="number" id="tsmcAdd" value="400" oninput="calculate()">
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>元大台灣 50 (0050)</h3>
+        <div class="input-grid">
+            <div>
+                <label>現價</label>
+                <input type="number" id="etf0050_price" value="61.9" oninput="calculate()">
+            </div>
+            <div>
+                <label>台積電權重 (%)</label>
+                <input type="number" id="etf0050_weight" value="61.6" oninput="calculate()">
+            </div>
+        </div>
+        <p>預估目標價：<span id="res0050" class="price-up">--</span></p>
+    </div>
+
+    <div class="card">
+        <h3>富邦科技 (0052)</h3>
+        <div class="input-grid">
+            <div>
+                <label>現價</label>
+                <input type="number" id="etf0052_price" value="215.5" oninput="calculate()">
+            </div>
+            <div>
+                <label>台積電權重 (%)</label>
+                <input type="number" id="etf0052_weight" value="65.2" oninput="calculate()">
+            </div>
+        </div>
+        <p>預估目標價：<span id="res0052" class="price-up">--</span></p>
+    </div>
+</div>
+
+<script>
+function calculate() {
+    const tsmcPrice = parseFloat(document.getElementById('tsmcCurrent').value);
+    const tsmcAdd = parseFloat(document.getElementById('tsmcAdd').value);
+    const tsmcRate = tsmcAdd / tsmcPrice;
+
+    // 計算 0050
+    const p50 = parseFloat(document.getElementById('etf0050_price').value);
+    const w50 = parseFloat(document.getElementById('etf0050_weight').value) / 100;
+    document.getElementById('res0050').innerText = (p50 * (1 + tsmcRate * w50)).toFixed(2);
+
+    // 計算 0052
+    const p52 = parseFloat(document.getElementById('etf0052_price').value);
+    const w52 = parseFloat(document.getElementById('etf0052_weight').value) / 100;
+    document.getElementById('res0052').innerText = (p52 * (1 + tsmcRate * w52)).toFixed(2);
+}
+
+// 證交所 API 提示說明：
+// 實際開發時，你可以使用以下 URL 獲取每日權重資料：
+// https://www.twse.com.tw/exchangeReport/MI_INDEX?response=json&date=20251218&type=ALL
+// 注意：瀏覽器會有 CORS 跨網域限制，建議由後端 (Node.js/Python) 抓取後再傳給前端。
+
+calculate();
+</script>
+</body>
+</html>
